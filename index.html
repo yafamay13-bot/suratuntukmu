@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Surat untuk Kamu 💌</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Playfair+Display:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg1:#fde7ee; --bg2:#e9defa; --paper:#fffaf3; --ink:#4a3a40;
+  --accent:#e0607e; --accent2:#b38bd9; --card:#ffffffcc; --shadow:0 10px 30px #b0607a33;
+}
+[data-theme="dark"]{
+  --bg1:#14122b; --bg2:#2a1f4d; --paper:#2b2540; --ink:#f3e9f5;
+  --accent:#ff8fab; --accent2:#c3a6ff; --card:#ffffff14; --shadow:0 10px 30px #00000066;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Playfair Display',serif; color:var(--ink); min-height:100vh;
+  background:linear-gradient(160deg,var(--bg1),var(--bg2)) fixed; transition:.5s;
+  overflow-x:hidden;
+}
+#bg{position:fixed;inset:0;pointer-events:none;z-index:0}
+.hide{display:none!important}
+.hand{font-family:'Caveat',cursive}
+section,.screen{position:relative;z-index:1}
+
+/* ---------- GATE ---------- */
+.screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+.gate-box{background:var(--card);backdrop-filter:blur(10px);padding:36px 28px;border-radius:24px;box-shadow:var(--shadow);max-width:380px;width:100%}
+.gate-box h1{font-size:1.6rem;margin:10px 0}
+.gate-box p{opacity:.8;margin-bottom:18px}
+.gate-box input{width:100%;padding:12px 16px;border-radius:14px;border:2px solid var(--accent2);background:transparent;color:var(--ink);font-size:1rem;text-align:center;outline:none}
+.btn{margin-top:14px;padding:12px 26px;border:none;border-radius:999px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;font-size:1rem;font-family:inherit;cursor:pointer;box-shadow:var(--shadow);transition:.2s}
+.btn:hover{transform:translateY(-2px) scale(1.03)}
+.btn:disabled{opacity:.6;cursor:wait;transform:none}
+.shake{animation:shake .4s}
+@keyframes shake{25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+#hint{margin-top:10px;font-size:.85rem;color:var(--accent);min-height:1.2em}
+
+/* ---------- ENVELOPE ---------- */
+.envelope{position:relative;width:min(320px,80vw);height:210px;cursor:pointer;margin-top:20px;transition:.4s}
+.envelope:hover{transform:scale(1.04)}
+.env-back,.env-front{position:absolute;inset:0;border-radius:10px}
+.env-back{background:#e8b4c4}
+.env-paper{position:absolute;left:8%;right:8%;top:8%;height:80%;background:var(--paper);border-radius:6px;transition:transform 1s .5s;z-index:1;box-shadow:0 2px 8px #0002}
+.env-front{background:linear-gradient(135deg,#f3c6d3 50%,transparent 50%),linear-gradient(225deg,#f0b9c9 50%,transparent 50%);z-index:2;clip-path:polygon(0 0,50% 55%,100% 0,100% 100%,0 100%)}
+.env-front::after{content:"";position:absolute;inset:0;background:#f5c9d6;clip-path:polygon(0 100%,50% 45%,100% 100%)}
+.env-flap{position:absolute;left:0;right:0;top:0;height:60%;background:#e59fb5;clip-path:polygon(0 0,100% 0,50% 100%);transform-origin:top;transition:transform .7s;z-index:3}
+.seal{position:absolute;left:50%;top:50%;transform:translate(-50%,-60%);width:54px;height:54px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ff7a96,#b3263f);color:#fff;display:grid;place-items:center;font-size:1.5rem;z-index:4;box-shadow:0 4px 10px #0004;transition:.4s;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{transform:translate(-50%,-60%) scale(1.12)}}
+.envelope.open .env-flap{transform:rotateX(180deg);z-index:0}
+.envelope.open .seal{opacity:0;transform:translate(-50%,-60%) scale(0)}
+.envelope.open .env-paper{transform:translateY(-70px)}
+
+/* ---------- MAIN ---------- */
+main{max-width:760px;margin:0 auto;padding:40px 18px 120px}
+.card{background:var(--card);backdrop-filter:blur(8px);border-radius:24px;padding:28px 24px;box-shadow:var(--shadow);margin-bottom:36px}
+.title{text-align:center;font-size:1.5rem;margin-bottom:18px}
+.paper{background:var(--paper);border-radius:6px;padding:34px 28px;box-shadow:var(--shadow);position:relative;
+  background-image:repeating-linear-gradient(transparent 0 31px,#e0607e22 31px 32px)}
+.paper p{line-height:32px;font-size:1.08rem;margin-bottom:32px;min-height:32px}
+#signature{font-size:2rem;text-align:right;opacity:0;transform:translateY(10px);transition:1s;color:var(--accent)}
+#signature.show{opacity:1;transform:none}
+.skip{background:none;border:none;color:var(--accent);cursor:pointer;float:right;font-family:inherit;text-decoration:underline}
+
+.counter{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;text-align:center}
+.counter div{background:var(--paper);border-radius:16px;padding:16px 4px}
+.counter b{display:block;font-size:1.8rem;color:var(--accent)}
+.counter small{opacity:.7}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px}
+.mini{background:var(--paper);border:2px dashed var(--accent2);border-radius:16px;padding:22px 10px;cursor:pointer;text-align:center;transition:.25s}
+.mini:hover{transform:translateY(-5px) rotate(-1.5deg);border-color:var(--accent)}
+.mini span{font-size:2rem;display:block;margin-bottom:6px}
+
+.scratch-wrap{position:relative;height:130px;border-radius:16px;overflow:hidden;background:var(--paper);display:grid;place-items:center;text-align:center;padding:14px;font-size:1.2rem}
+#scratch{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair;transition:opacity 1s}
+
+.polaroids{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:22px;padding:6px}
+.pol{background:#fff;padding:10px 10px 36px;box-shadow:var(--shadow);transform:rotate(var(--r));transition:.3s;color:#4a3a40;position:relative}
+.pol:hover{transform:rotate(0) scale(1.08);z-index:5}
+.pol .ph{aspect-ratio:1;background:linear-gradient(135deg,#f9c5d1,#cdb4f6);display:grid;place-items:center;font-size:2rem;overflow:hidden}
+.pol img{width:100%;height:100%;object-fit:cover}
+.pol .cap{position:absolute;bottom:6px;left:0;right:0;text-align:center;font-family:'Caveat',cursive;font-size:1.3rem}
+
+textarea{width:100%;min-height:110px;padding:14px;border-radius:14px;border:2px solid var(--accent2);background:var(--paper);color:var(--ink);font-family:inherit;font-size:1rem;outline:none;resize:vertical}
+.center{text-align:center}
+#hugCount{font-size:1.1rem;margin-top:10px}
+#replyStatus{margin-top:12px;min-height:1.4em;font-size:1rem}
+
+/* modal */
+.modal{position:fixed;inset:0;background:#0007;display:grid;place-items:center;z-index:50;padding:20px;animation:fade .3s}
+.modal .box{background:var(--paper);max-width:420px;width:100%;padding:30px 26px;border-radius:20px;text-align:center;animation:pop .35s}
+.modal h3{margin-bottom:12px;color:var(--accent)}
+.modal p{line-height:1.7}
+@keyframes fade{from{opacity:0}}
+@keyframes pop{from{transform:scale(.7);opacity:0}}
+
+/* floating controls */
+.fab{position:fixed;right:14px;z-index:40;width:46px;height:46px;border-radius:50%;border:none;background:var(--card);backdrop-filter:blur(8px);box-shadow:var(--shadow);font-size:1.3rem;cursor:pointer}
+#themeBtn{bottom:70px}
+#musicBtn{bottom:16px}
+.burst{position:fixed;pointer-events:none;font-size:1.6rem;z-index:60;animation:up 1.3s forwards}
+@keyframes up{to{transform:translate(var(--dx),-180px) scale(1.6);opacity:0}}
+</style>
+</head>
+<body>
+<canvas id="bg"></canvas>
+
+<!-- GATE -->
+<div class="screen" id="gate">
+  <div class="gate-box">
+    <div style="font-size:3rem">🔒</div>
+    <h1 id="gateTitle">Eits, khusus buat kamu</h1>
+    <p id="gateQ"></p>
+    <input id="gateInput" type="text" inputmode="numeric" placeholder="Jawab di sini..." autocomplete="off">
+    <div id="hint"></div>
+    <button class="btn" id="gateBtn">Buka 💗</button>
+  </div>
+</div>
+
+<!-- ENVELOPE -->
+<div class="screen hide" id="stageEnv">
+  <h2 class="hand" style="font-size:2rem" id="envTitle"></h2>
+  <p style="opacity:.7;margin-top:6px">Klik segelnya ya 💌</p>
+  <div class="envelope" id="envelope">
+    <div class="env-back"></div>
+    <div class="env-paper"></div>
+    <div class="env-front"></div>
+    <div class="env-flap"></div>
+    <div class="seal">❤</div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<main class="hide" id="main">
+
+  <section class="card">
+    <h2 class="title hand" style="font-size:2.2rem">Untuk <span id="namaDia"></span> 💗</h2>
+    <button class="skip" id="skipBtn">lewati ⏭</button>
+    <div class="paper">
+      <div id="letterText"></div>
+      <div id="signature" class="hand"></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="title">⏳ Waktu Kita Bersama</h2>
+    <div class="counter">
+      <div><b id="cD">0</b><small>hari</small></div>
+      <div><b id="cH">0</b><small>jam</small></div>
+      <div><b id="cM">0</b><small>menit</small></div>
+      <div><b id="cS">0</b><small>detik</small></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="title">💭 Buka Saat...</h2>
+    <div class="grid" id="openGrid"></div>
+  </section>
+
+  <section class="card">
+    <h2 class="title">✨ Pesan Rahasia</h2>
+    <div class="scratch-wrap">
+      <div id="secretText"></div>
+      <canvas id="scratch"></canvas>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="title">📸 Kenangan Kita</h2>
+    <div class="polaroids" id="gallery"></div>
+  </section>
+
+  <section class="card center">
+    <h2 class="title">🤗 Kirim Peluk</h2>
+    <button class="btn" id="hugBtn">Peluk dulu 🤗</button>
+    <div id="hugCount"></div>
+  </section>
+
+  <section class="card">
+    <h2 class="title">📝 Balas Suratku</h2>
+    <textarea id="reply" placeholder="Tulis balasanmu di sini..."></textarea>
+    <div class="center">
+      <button class="btn" id="replyBtn">Kirim balasan 💌</button>
+      <div id="replyStatus"></div>
+    </div>
+  </section>
+
+  <p class="center hand" style="font-size:1.5rem;opacity:.8" id="footer"></p>
+</main>
+
+<audio id="audio" loop></audio>
+<button class="fab hide" id="themeBtn" title="Ganti tema">🌙</button>
+<button class="fab hide" id="musicBtn" title="Musik">🎵</button>
+
+<script>
+/* ================== EDIT BAGIAN INI SAJA ================== */
+const CONFIG = {
+  namaDia: "Sayang",
+  namaKamu: "Aku",
+  tanggalJadian: "2026-10-08T00:00:00",   // format: TAHUN-BULAN-TANGGAL
+  pertanyaan: "Tanggal jadian kita? (format DDMMYYYY)",
+  jawaban: "08102026",                    // TANGGAL BULAN TAHUN, angka saja
+  petunjuk: "Hint: tanggal pertama kali kita resmi 😆",
+  musik: "",                               // isi link .mp3 kalau mau, atau kosongkan
+
+  // ----- TELEGRAM -----
+  telegramToken: "8824231672:AAHit16QkSSOkyH3vFVlBTvVdwGbiIgV9FI",   // contoh: "123456789:AAH-xxxx"
+  telegramChatId: "8630697602",          // contoh: "123456789"
+
+  surat: [
+    "Hai kamu, iya kamu yang lagi baca ini.",
+    "Aku bikin surat ini bukan karena lagi ada apa-apa, tapi karena aku pengin kamu tahu betapa berartinya kamu buat aku.",
+    "Terima kasih sudah sabar, sudah selalu ada, dan sudah jadi rumah paling nyaman buat aku pulang.",
+    "Semoga kita terus tumbuh bareng, ya. Aku sayang kamu, hari ini dan seterusnya."
+  ],
+  openWhen: [
+    {emoji:"😢", judul:"Kamu lagi sedih",  isi:"Peluk jauh dulu ya. Kamu kuat, kamu hebat, dan aku selalu ada di sisimu. Tarik napas pelan-pelan, semuanya pasti lewat."},
+    {emoji:"🥺", judul:"Kamu kangen aku", isi:"Aku juga kangen kamu! Coba lihat foto kita, terus telepon aku sekarang juga 😆"},
+    {emoji:"😴", judul:"Kamu susah tidur", isi:"Tutup mata, bayangin kita lagi jalan berdua. Selamat tidur, mimpi indah ya sayang 🌙"},
+    {emoji:"🎂", judul:"Hari ulang tahunmu", isi:"Selamat ulang tahun! Semoga semua doamu terkabul. Terima kasih sudah lahir ke dunia ini 💗"},
+    {emoji:"😤", judul:"Kamu lagi kesal sama aku", isi:"Maaf ya kalau aku bikin kamu kesal. Yuk kita bicarakan baik-baik, aku sayang kamu."}
+  ],
+  rahasia: "Aku mau seumur hidup sama kamu 💍",
+  foto: [  // isi src dengan nama file foto, contoh: "foto1.jpg"
+    {src:"", caption:"Pertama ketemu"},
+    {src:"", caption:"Jalan bareng"},
+    {src:"", caption:"Makan es krim"},
+    {src:"", caption:"Hari favorit"}
+  ],
+  tandaTangan: "Dari aku, yang sayang kamu ❤"
+};
+/* ========================================================== */
+
+const $=s=>document.querySelector(s), sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* ---------- init teks ---------- */
+$('#gateQ').textContent = CONFIG.pertanyaan;
+$('#namaDia').textContent = CONFIG.namaDia;
+$('#envTitle').textContent = "Ada surat untuk " + CONFIG.namaDia;
+$('#signature').textContent = CONFIG.tandaTangan;
+$('#secretText').textContent = CONFIG.rahasia;
+$('#footer').textContent = "— " + CONFIG.namaKamu + " 💕";
+if(CONFIG.musik) $('#audio').src = CONFIG.musik;
+
+/* ---------- gate ---------- */
+let wrong = 0;
+function checkGate(){
+  const v = $('#gateInput').value.trim().replace(/[\s\/\-.]/g,'');
+  if(v === CONFIG.jawaban){
+    $('#gate').classList.add('hide');
+    $('#stageEnv').classList.remove('hide');
+    $('#themeBtn').classList.remove('hide');
+    if(CONFIG.musik) $('#musicBtn').classList.remove('hide'), playMusic();
+  }else{
+    wrong++;
+    const b = document.querySelector('.gate-box');
+    b.classList.remove('shake'); void b.offsetWidth; b.classList.add('shake');
+    $('#hint').textContent = wrong >= 2 ? CONFIG.petunjuk : "Hmm, kayaknya salah 🤔";
+  }
+}
+$('#gateBtn').onclick = checkGate;
+$('#gateInput').addEventListener('keydown', e => e.key==='Enter' && checkGate());
+
+/* ---------- musik & tema ---------- */
+function playMusic(){ $('#audio').play().then(()=>$('#musicBtn').textContent='🎵').catch(()=>{}); }
+$('#musicBtn').onclick = () => {
+  const a = $('#audio');
+  if(a.paused){ a.play(); $('#musicBtn').textContent='🎵'; } else { a.pause(); $('#musicBtn').textContent='🔇'; }
+};
+$('#themeBtn').onclick = () => {
+  const d = document.documentElement;
+  const dark = d.dataset.theme === 'dark';
+  d.dataset.theme = dark ? '' : 'dark';
+  $('#themeBtn').textContent = dark ? '🌙' : '☀️';
+};
+
+/* ---------- amplop ---------- */
+$('#envelope').onclick = async () => {
+  $('#envelope').classList.add('open');
+  await sleep(1700);
+  $('#stageEnv').classList.add('hide');
+  $('#main').classList.remove('hide');
+  initScratch();
+  typeLetter();
+};
+
+/* ---------- mesin tik ---------- */
+let skip = false;
+$('#skipBtn').onclick = () => skip = true;
+async function typeLetter(){
+  const box = $('#letterText'); box.innerHTML = '';
+  for(const p of CONFIG.surat){
+    const el = document.createElement('p'); box.appendChild(el);
+    for(const ch of p){
+      if(skip) break;
+      el.textContent += ch;
+      await sleep(30);
+    }
+    if(skip) break;
+    await sleep(350);
+  }
+  if(skip) box.innerHTML = CONFIG.surat.map(p=>`<p>${p}</p>`).join('');
+  $('#signature').classList.add('show');
+  $('#skipBtn').style.display = 'none';
+}
+
+/* ---------- counter ---------- */
+function tick(){
+  const diff = Math.max(0, Date.now() - new Date(CONFIG.tanggalJadian).getTime());
+  $('#cD').textContent = Math.floor(diff/864e5);
+  $('#cH').textContent = Math.floor(diff/36e5)%24;
+  $('#cM').textContent = Math.floor(diff/6e4)%60;
+  $('#cS').textContent = Math.floor(diff/1e3)%60;
+}
+tick(); setInterval(tick, 1000);
+
+/* ---------- open when ---------- */
+CONFIG.openWhen.forEach(o => {
+  const d = document.createElement('div');
+  d.className = 'mini';
+  d.innerHTML = `<span>${o.emoji}</span><b>Buka saat ${o.judul.toLowerCase()}</b>`;
+  d.onclick = () => openModal(o.emoji + " " + o.judul, o.isi);
+  $('#openGrid').appendChild(d);
+});
+function openModal(title, text){
+  const m = document.createElement('div');
+  m.className = 'modal';
+  m.innerHTML = `<div class="box"><h3>${title}</h3><p>${text}</p><button class="btn">Tutup</button></div>`;
+  m.onclick = e => { if(e.target===m || e.target.tagName==='BUTTON') m.remove(); };
+  document.body.appendChild(m);
+  burst(innerWidth/2, innerHeight/2, 6);
+}
+
+/* ---------- galeri ---------- */
+CONFIG.foto.forEach((f,i) => {
+  const d = document.createElement('div');
+  d.className = 'pol';
+  d.style.setProperty('--r', ((i%2?1:-1)*(2+i))+'deg');
+  d.innerHTML = `<div class="ph">${f.src ? `<img src="${f.src}" alt="">` : '📷'}</div><div class="cap">${f.caption}</div>`;
+  $('#gallery').appendChild(d);
+});
+
+/* ---------- kartu gosok ---------- */
+function initScratch(){
+  const c = $('#scratch'), x = c.getContext('2d');
+  const r = c.getBoundingClientRect(); c.width = r.width; c.height = r.height;
+  const g = x.createLinearGradient(0,0,c.width,c.height);
+  g.addColorStop(0,'#d9c4a8'); g.addColorStop(1,'#b99d7c');
+  x.fillStyle = g; x.fillRect(0,0,c.width,c.height);
+  x.fillStyle = '#fff'; x.font = '20px Caveat, cursive'; x.textAlign = 'center';
+  x.fillText('✨ gosok di sini ✨', c.width/2, c.height/2+6);
+  let down = false, n = 0;
+  const pos = e => { const b = c.getBoundingClientRect(), p = e.touches ? e.touches[0] : e; return {x:p.clientX-b.left, y:p.clientY-b.top}; };
+  const move = e => {
+    if(!down) return; e.preventDefault();
+    const p = pos(e);
+    x.globalCompositeOperation = 'destination-out';
+    x.beginPath(); x.arc(p.x, p.y, 20, 0, 7); x.fill();
+    if(++n % 8 === 0) checkScratch();
+  };
+  function checkScratch(){
+    const d = x.getImageData(0,0,c.width,c.height).data;
+    let clear = 0, total = 0;
+    for(let i=3;i<d.length;i+=64){ total++; if(d[i]===0) clear++; }
+    if(clear/total > .45){ c.style.opacity = 0; c.style.pointerEvents = 'none'; burst(innerWidth/2, innerHeight/2, 10); }
+  }
+  c.addEventListener('mousedown', e=>{down=true; move(e)});
+  c.addEventListener('touchstart', e=>{down=true; move(e)}, {passive:false});
+  addEventListener('mouseup', ()=>down=false);
+  addEventListener('touchend', ()=>down=false);
+  c.addEventListener('mousemove', move);
+  c.addEventListener('touchmove', move, {passive:false});
+}
+
+/* ---------- peluk ---------- */
+let hugs = +(localStorage.getItem('hugs')||0);
+const showHugs = () => $('#hugCount').textContent = hugs ? `Sudah ${hugs} peluk terkirim 💞` : '';
+showHugs();
+$('#hugBtn').onclick = e => {
+  hugs++; localStorage.setItem('hugs', hugs); showHugs();
+  burst(e.clientX, e.clientY, 8);
+};
+
+/* ---------- balas via TELEGRAM ---------- */
+$('#replyBtn').onclick = async () => {
+  const t = $('#reply').value.trim();
+  const status = $('#replyStatus'), btn = $('#replyBtn');
+  if(!t){ $('#reply').focus(); return; }
+
+  btn.disabled = true;
+  btn.textContent = 'Mengirim... ⏳';
+  status.textContent = '';
+
+  try{
+    const res = await fetch(`https://api.telegram.org/bot${CONFIG.telegramToken}/sendMessage`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        chat_id: CONFIG.telegramChatId,
+        text: `💌 Balasan surat dari ${CONFIG.namaDia}:\n\n${t}`
+      })
+    });
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.description || 'Gagal');
+
+    status.textContent = 'Terkirim! Balasanmu sudah sampai 💗';
+    $('#reply').value = '';
+    burst(innerWidth/2, innerHeight/2, 12);
+  }catch(err){
+    console.error(err);
+    status.textContent = 'Yah, gagal terkirim. Coba lagi ya 🥺';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Kirim balasan 💌';
+  }
+};
+
+/* ---------- efek hati meledak ---------- */
+function burst(x, y, n=6){
+  const em = ['💗','💖','💕','✨','🌸'];
+  for(let i=0;i<n;i++){
+    const s = document.createElement('div');
+    s.className = 'burst';
+    s.textContent = em[Math.floor(Math.random()*em.length)];
+    s.style.left = x+'px'; s.style.top = y+'px';
+    s.style.setProperty('--dx', (Math.random()*160-80)+'px');
+    s.style.animationDelay = (i*60)+'ms';
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(), 1600);
+  }
+}
+
+/* ---------- background hati jatuh ---------- */
+const cv = $('#bg'), ctx = cv.getContext('2d');
+let W, H, items = [];
+function resize(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+resize(); addEventListener('resize', resize);
+const sym = ['💗','🌸','✨','💕'];
+for(let i=0;i<22;i++) items.push({
+  x:Math.random()*innerWidth, y:Math.random()*innerHeight,
+  s:12+Math.random()*16, v:.3+Math.random()*.7, w:Math.random()*Math.PI*2,
+  e:sym[Math.floor(Math.random()*sym.length)]
+});
+(function draw(){
+  ctx.clearRect(0,0,W,H);
+  items.forEach(p=>{
+    p.y += p.v; p.w += .02; p.x += Math.sin(p.w)*.5;
+    if(p.y > H+30){ p.y = -30; p.x = Math.random()*W; }
+    ctx.globalAlpha = .55; ctx.font = p.s+'px serif';
+    ctx.fillText(p.e, p.x, p.y);
+  });
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
